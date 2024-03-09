@@ -19,7 +19,7 @@ export default function mergeSort(array: number[]) {
 }
 mergeSort(arr1);
 
-function merge(parent: number[], sub1: number[], sub2: number[]) {
+export function merge(parent: number[], sub1: number[], sub2: number[]) {
   // should using left,right, and middle index instead
   let i = 0,
     j = 0,
