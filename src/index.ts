@@ -126,6 +126,7 @@ class Tree {
      */
     let current: Node | null = this.root;
     let parent: Node | null = null;
+    let isCurrentOnTheLeft: boolean = false; // refactor the code
     while (true) {
       // need to implement a parent
       // current = null won't work because  directly modifying is not accepted but reassigning is still fine
@@ -139,35 +140,84 @@ class Tree {
       } else if (value === current.value && !current.left && !current.right) {
         //* leaf node
         // check if current is on right or left of parent
-        console.log(parent);
-        console.log(current);
+        if (value === this.root.value) {
+          this.root = null;
+          break;
+        }
+        if (parent.left) {
+          // current on the left
+          parent.left = null;
+        } else {
+          // current on the right
+          parent.right = null;
+        }
 
-        // update parent.correspondingDirection = null
         break;
-      } else if (value === current.value && (current.left || current.right)) {
+      } else if (
+        value === current.value &&
+        ((current.left && !current.right) || (current.right && !current.left))
+      ) {
         //* one child case
         // check if current is on the right or left of parent
-        console.log(parent);
-        console.log(current);
+        if (value === this.root.value) {
+          if (this.root.left) {
+            this.root = current.left;
+          } else {
+            this.root = current.right;
+          }
+          break;
+        }
 
+        if (current.left) {
+          parent.left = current.left;
+          console.log(parent);
+        } else {
+          parent.right = current.right;
+          console.log(parent);
+        }
         //  update parent.correspondingDirection = current.correspondingDirection
         break;
       } else if (value === current.value && current.left && current.right) {
         //* two childe case
-        // check if current is on the right or left of parent
         // finding the nearest bigger than current (move right once, and move left untill null)
         // parent.correspondingDirection = that nearest
         // deleteItem(that nearest.value)
-        console.log(parent);
-        console.log(current);
 
+        let subCurrent = current.right;
+        const leftHalfOfCurrent = current.left;
+
+        while (subCurrent.left) {
+          subCurrent = subCurrent.left;
+        }
+        // check if current is on the right or left of parent
+
+        if ((value = this.root.value)) {
+          subCurrent.left = leftHalfOfCurrent;
+
+          this.root = subCurrent;
+          this.deleteItem(current.value);
+          break;
+        }
+        if (parent.left.value === current.value) {
+          subCurrent.left = leftHalfOfCurrent;
+          parent.left = subCurrent;
+          console.log(subCurrent);
+
+          this.deleteItem(current.value);
+        }
+        // parent.co = subCurrent;
+        else {
+          subCurrent.left = leftHalfOfCurrent;
+          parent.right = subCurrent;
+          this.deleteItem(current.value);
+        }
         break;
       } else {
         break;
       }
     }
   }
-
+  getSuccessor(delNode): Node {}
   find(value: number) {
     /**
      * Write a find(value) function that returns the node with the given value
@@ -218,12 +268,7 @@ class Tree {
 const tree = new Tree([5, 1, 5, 2, 2, 2, 9, 7, 3, 4, 8, 6]); // 1,2,3,4,5,6,7,8,9
 tree.root = tree.buildTree(tree.sortedArray, 0, tree.sortedArray.length - 1);
 
-console.log(tree.root);
-let current = tree.root.left.left.left;
-let parent = tree.root.left.left;
-// current = current.left;
-console.log(current);
-
-console.log(parent);
+prettyPrint(tree.root);
+tree.deleteItem(5);
 
 prettyPrint(tree.root);
