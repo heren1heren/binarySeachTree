@@ -192,19 +192,14 @@ class Tree {
      */
 
     let c = this.root;
-    console.log(c);
     while (true) {
       if (value === this.root.value) {
         return this.root;
       }
       if (value > c.value && c.right) {
-        console.log(c);
-
         //
         c = c.right;
       } else if (value < c.value && c.left) {
-        console.log(c);
-
         //
         c = c.left;
       } else if (value === c.value) {
@@ -294,10 +289,31 @@ class Tree {
   height(node: Node) {
     //Write a height(node) function that returns the given node’s height.
     // Height is defined as the number of edges in the longest path from a given node to a leaf node.
+    // well how can i do it?
+    //* ideas:
+    if (!node) {
+      return null;
+    }
+    if (!this.root) {
+      return null;
+    }
+    let height = 0;
+    const queue = [this.root];
+    let level = 0;
+
+    while (queue.length > 0) {
+      // transverse each level
+      // after each level -> level++
+      //
+    }
+    return height;
   }
   depth(node: Node) {
+    let depth = 0;
     //Write a depth(node) function that returns the given node’s depth.
     //Depth is defined as the number of edges in the path from a given node to the tree’s root node.
+    // depth = MaxLevel from the root  - height
+    return depth;
   }
   isBalanced() {
     //Write an isBalanced function that checks if the tree is balanced.
@@ -321,9 +337,7 @@ function printTree(string, value) {
   // need to return it
 }
 
-const inOrderValues = tree.inOrder();
-console.log(inOrderValues);
-const preOrderValues = tree.preOrder();
-console.log(preOrderValues);
+const node = tree.find(30);
+console.log(node);
 
 prettyPrint(tree.root);
