@@ -121,7 +121,97 @@ class Tree {
      * case 3: del node with two child
      * -> finding the nearest bigger than the node ( move down on the right)
      *   -> recursively call deleteItem(that node.value)
+     *
+     * we need to travel as in insert() method.
      */
+    let current = this.root;
+
+    while (true) {
+      if (
+        // leaf node
+        current.value === value &&
+        current.left === null &&
+        current.right === null
+      ) {
+        current = null; // delete the leaf
+        console.log(current); // current is null here
+
+        console.log('why is it not deleted');
+        break;
+      } else if (current.value === value && (current.left || current.right)) {
+        if (current.left !== null) {
+          current = current.left;
+
+          break;
+        } else {
+          current = current.right;
+          break;
+        }
+      } else if (current.value === value && current.left && current.right) {
+        let subCurrent = current.right;
+        while (subCurrent.left !== null) {
+          subCurrent = subCurrent.left;
+        }
+
+        this.deleteItem(subCurrent.value);
+        current = subCurrent;
+      } else if (value > current.value) {
+        // move
+        current = current.right;
+      } else if (value < current.value) {
+        // move
+        current = current.left;
+      } else {
+        console.log('calm down after writing this function. Okay?');
+
+        break;
+      }
+    }
+  }
+
+  deleteItemz(value: number): void {
+    let parent: Node | null = null;
+    let current: Node | null = this.root;
+
+    while (current !== null) {
+      if (value > current.value) {
+        parent = current;
+        current = current.right;
+      } else if (value < current.value) {
+        parent = current;
+        current = current.left;
+      } else {
+        if (current.left !== null && current.right !== null) {
+          let subCurrent = current.right;
+          while (subCurrent.left !== null) {
+            subCurrent = subCurrent.left;
+          }
+
+          current.value = subCurrent.value;
+          this.deleteItem(subCurrent.value);
+          break;
+        } else {
+          if (parent === null) {
+            if (current.left !== null) {
+              current.value = current.left.value;
+              current.right = current.left.right;
+              current.left = current.left.left;
+            } else if (current.right !== null) {
+              current.value = current.right.value;
+              current.left = current.right.left;
+              current.right = current.right.right;
+            } else {
+              throw new Error('Cannot delete root element.');
+            }
+          } else if (parent.left === current) {
+            parent.left = current.left ?? current.right;
+          } else if (parent.right === current) {
+            parent.right = current.left ?? current.right;
+          }
+          break;
+        }
+      }
+    }
   }
 
   find(value: number) {
@@ -173,10 +263,8 @@ class Tree {
 
 const tree = new Tree([5, 1, 5, 2, 2, 2, 9, 7, 3, 4, 8, 6]); // 1,2,3,4,5,6,7,8,9
 tree.root = tree.buildTree(tree.sortedArray, 0, tree.sortedArray.length - 1);
-tree.insert(10);
-tree.insert(15);
-tree.insert(14);
 
+tree.deleteItemz(5);
 console.log(tree.root);
 
 prettyPrint(tree.root);
