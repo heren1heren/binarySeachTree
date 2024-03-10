@@ -23,7 +23,6 @@ const prettyPrint = (node, prefix = '', isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? '    ' : '│   '}`, true);
   }
 };
-type cb = () => void;
 class Node {
   value: number;
   right: Node | null; // give it type class Node
@@ -70,26 +69,7 @@ class Tree {
     node.right = this.buildTree(array, midIndex + 1, end);
     return node;
   }
-  /** * You may be tempted to 
-   * implement these methods using the original input array used to build the tree,
-     but it’s important for the efficiency of these operations that you don’t do this. If we refer back to the Big O Cheatsheet,
-     we’ll see that binary search trees can insert/delete in O(log n) time, 
-     which is a significant performance boost over arrays for the same operations.
-     To get this added efficiency, your implementation of these methods
-      should traverse the tree and manipulate the nodes and their connections.
-     * */
   insert(value: number) {
-    /* functions that insert the given value.
-    the idea is to compare value with current node.value
-    
-    if(value === current node .value) return current node.value = value;
-
-    if(value > current node.value) move down to the next right node
-    if(value < current node. value) move down to the next left node
-     if(current node.value === null) return current node.value = value;
-    
-    */
-    // can't use recursive -> using while
     let current = this.root;
     const node = new Node(value);
     if (this.root === null) return (this.root = node);
@@ -112,43 +92,27 @@ class Tree {
     }
   }
   deleteItem(value: number) {
-    /**
-     * algorithm:
-     * case 1: del leaf( a node without child)
-     * ->
-     *case 2: del node with only one child
-     * ->  replace the node by parent.correspondingDirection = current.child
-     * case 3: del node with two child
-     * -> finding the nearest bigger than the node ( move down on the right)
-     *   -> recursively call deleteItem(that node.value)
-     
-     * we need to travel as in insert() method.
-     */
     let current: Node | null = this.root;
     let parent: Node | null = null;
     let isCurrentOnTheLeft: boolean = false; // refactor the code
     while (true) {
-      // need to implement a parent
-      // current = null won't work because  directly modifying is not accepted but reassigning is still fine
-      // for example, parent.left (current) = null is accepted
       if (value > current.value && current.right) {
         parent = current;
         current = current.right;
+        isCurrentOnTheLeft = false;
       } else if (value < current.value && current.left) {
         parent = current;
         current = current.left;
+        isCurrentOnTheLeft = true;
       } else if (value === current.value && !current.left && !current.right) {
         //* leaf node
-        // check if current is on right or left of parent
         if (value === this.root.value) {
           this.root = null;
           break;
         }
-        if (parent.left) {
-          // current on the left
+        if (isCurrentOnTheLeft) {
           parent.left = null;
         } else {
-          // current on the right
           parent.right = null;
         }
 
@@ -158,9 +122,8 @@ class Tree {
         ((current.left && !current.right) || (current.right && !current.left))
       ) {
         //* one child case
-        // check if current is on the right or left of parent
         if (value === this.root.value) {
-          if (this.root.left) {
+          if (isCurrentOnTheLeft) {
             this.root = current.left;
           } else {
             this.root = current.right;
@@ -168,48 +131,26 @@ class Tree {
           break;
         }
 
-        if (current.left) {
+        if (isCurrentOnTheLeft) {
           parent.left = current.left;
-          console.log(parent);
         } else {
           parent.right = current.right;
-          console.log(parent);
         }
-        //  update parent.correspondingDirection = current.correspondingDirection
         break;
       } else if (value === current.value && current.left && current.right) {
         //* two childe case
-        // finding the nearest bigger than current (move right once, and move left untill null)
-        // parent.correspondingDirection = that nearest
-        // deleteItem(that nearest.value)
+        let successor = this.getSuccessor(current);
 
-        let subCurrent = current.right;
-        const leftHalfOfCurrent = current.left;
-
-        while (subCurrent.left) {
-          subCurrent = subCurrent.left;
-        }
         // check if current is on the right or left of parent
 
-        if ((value = this.root.value)) {
-          subCurrent.left = leftHalfOfCurrent;
-
-          this.root = subCurrent;
-          this.deleteItem(current.value);
+        if (value === this.root.value) {
+          this.root = successor;
           break;
         }
-        if (parent.left.value === current.value) {
-          subCurrent.left = leftHalfOfCurrent;
-          parent.left = subCurrent;
-          console.log(subCurrent);
-
-          this.deleteItem(current.value);
-        }
-        // parent.co = subCurrent;
-        else {
-          subCurrent.left = leftHalfOfCurrent;
-          parent.right = subCurrent;
-          this.deleteItem(current.value);
+        if (isCurrentOnTheLeft) {
+          parent.left = successor;
+        } else {
+          parent.right = successor;
         }
         break;
       } else {
@@ -217,35 +158,139 @@ class Tree {
       }
     }
   }
-  getSuccessor(delNode): Node {}
+  getSuccessor(delNode: Node): Node {
+    let parentSuccessor = delNode;
+    let successor = delNode.right;
+    let rightSuccessor = successor.right;
+
+    const leftDelNode = delNode.left;
+    const rightDelNode = delNode.right;
+
+    while (successor.left) {
+      // move left
+      parentSuccessor = successor;
+      rightSuccessor = successor.right;
+      successor = successor.left; // move down left find closest element;
+    }
+    // update parentNode
+    if (successor.right) {
+      parentSuccessor.left = successor.right;
+    } else {
+      parentSuccessor.left = null;
+    }
+
+    //copy delNode.right and left to successor (after deleting successor)
+    successor.right = rightDelNode;
+
+    successor.left = leftDelNode;
+
+    return successor;
+  }
   find(value: number) {
     /**
      * Write a find(value) function that returns the node with the given value
      */
+
+    let c = this.root;
+    console.log(c);
+    while (true) {
+      if (value === this.root.value) {
+        return this.root;
+      }
+      if (value > c.value && c.right) {
+        console.log(c);
+
+        //
+        c = c.right;
+      } else if (value < c.value && c.left) {
+        console.log(c);
+
+        //
+        c = c.left;
+      } else if (value === c.value) {
+        return c;
+      } else {
+        return null;
+      }
+    }
   }
-  levelOrder(callback: cb) {
-    /**
-     * Write a levelOrder(callback) function that accepts an optional callback function as its parameter.
-     * levelOrder should traverse the tree in breadth-first level order and provide each node as an argument to the callback.
-     *  As a result, the callback will perform an operation on each node following the order in which they are traversed.
-     * levelOrder may be implemented using either iteration or recursion (try implementing both!).
-     * The method should return an array of values if no callback is given as an argument.
-     *  Tip: You will want to use an array acting as a queue to keep track of all the child nodes that you have yet to traverse and to add new ones to the list (as you saw in the video).
-     */
+  levelOrder(callback) {
+    const queue = [this.root];
+    let string = '';
+    const array = [];
+    while (queue.length > 0) {
+      const node = queue.shift(); //
+      array.push(node.value);
+      string = callback(string, node.value);
+      if (node.left) {
+        queue.push(node.left);
+      }
+      if (node.right) {
+        queue.push(node.right);
+      }
+    }
+
+    return string ? string : array;
   }
 
   /**Write inOrder(callback), preOrder(callback), and postOrder(callback) functions that also accept an optional callback as a parameter.
    * Each of these functions should traverse the tree in their respective depth-first order and yield each node to the provided callback.
    * The functions should return an array of values if no callback is given as an argument. */
-  inOrder(callback: cb) {
-    //
+  inOrder(callback) {
+    // recursive function
+    const array: number[] = [];
+
+    function transverse(node: Node) {
+      if (node !== null) {
+        if (callback) {
+          callback(node.value);
+        } else {
+          array.push(node.value);
+        }
+        transverse(node.left);
+        transverse(node.right);
+      }
+    }
+    transverse(this.root);
+    return array;
   }
-  preOrder(callback: cb) {
+
+  preOrder(callback) {
     //
+    const array: number[] = [];
+
+    function transverse(node: Node) {
+      if (node !== null) {
+        transverse(node.left);
+        if (callback) {
+          callback(node.value);
+        } else {
+          array.push(node.value);
+        }
+        transverse(node.right);
+      }
+    }
+    transverse(this.root);
+    return array;
   }
-  postOrder(callback: cb) {
-    //
+  postOrder(callback) {
+    const array: number[] = [];
+
+    function transverse(node: Node) {
+      transverse(node.left);
+      transverse(node.right);
+      if (node !== null) {
+        if (callback) {
+          callback(node.value);
+        } else {
+          array.push(node.value);
+        }
+      }
+    }
+    transverse(this.root);
+    return array;
   }
+
   height(node: Node) {
     //Write a height(node) function that returns the given node’s height.
     // Height is defined as the number of edges in the longest path from a given node to a leaf node.
@@ -265,10 +310,20 @@ class Tree {
   }
 }
 
-const tree = new Tree([5, 1, 5, 2, 2, 2, 9, 7, 3, 4, 8, 6]); // 1,2,3,4,5,6,7,8,9
+const tree = new Tree([5, 10, 15, 20, 25, 30, 400, 55, 75, 60, 45, 55]); // 1,2,3,4,5,6,7,8,9
 tree.root = tree.buildTree(tree.sortedArray, 0, tree.sortedArray.length - 1);
 
-prettyPrint(tree.root);
-tree.deleteItem(5);
+// prettyPrint(tree.root);
+
+function printTree(string, value) {
+  return (string += `${value}  `); // string is passed by value
+  // it won't change
+  // need to return it
+}
+
+const inOrderValues = tree.inOrder();
+console.log(inOrderValues);
+const preOrderValues = tree.preOrder();
+console.log(preOrderValues);
 
 prettyPrint(tree.root);
