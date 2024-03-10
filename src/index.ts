@@ -365,7 +365,20 @@ class Tree {
     //Write an isBalanced function that checks if the tree is balanced.
     // A balanced tree is one where the difference between heights of the left subtree
     // and the right subtree of every node is not more than 1.
+
+    /**
+     * *assumption:
+     * checking height of each leaf.
+     * if there is a leaf that return height > 1
+     * return false
+     *
+     *
+     *
+     * return true
+     */
+    return true;
   }
+
   rebalance() {
     //Write a rebalance function that rebalances an unbalanced tree.
     // Tip: You’ll want to use a traversal method to provide a new array to the buildTree function.
