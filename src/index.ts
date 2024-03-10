@@ -297,22 +297,68 @@ class Tree {
     if (!this.root) {
       return null;
     }
-    let height = 0;
+    let height = -1;
+    let depth = -1;
     const queue = [this.root];
-    let level = 0;
+    let level = -1;
 
     while (queue.length > 0) {
       // transverse each level
       // after each level -> level++
-      //
+      // if the node is inside the level -> height = level;
+      const staticQueueLength = queue.length; // each level queue length
+      for (let i = 0; i < staticQueueLength; i++) {
+        const frontNode = queue.shift();
+        if (node.value === frontNode.value) {
+          depth = level;
+        }
+        if (frontNode.left !== null) {
+          queue.push(frontNode.left);
+        }
+        if (frontNode.right !== null) {
+          queue.push(frontNode.right);
+        }
+      }
+
+      level++;
     }
+
+    height = level - depth - 1;
+
     return height;
   }
   depth(node: Node) {
-    let depth = 0;
-    //Write a depth(node) function that returns the given node’s depth.
-    //Depth is defined as the number of edges in the path from a given node to the tree’s root node.
-    // depth = MaxLevel from the root  - height
+    if (!node) {
+      return null;
+    }
+    if (!this.root) {
+      return null;
+    }
+
+    let depth = -1;
+    const queue = [this.root];
+    let level = -1;
+
+    while (queue.length > 0) {
+      // transverse each level
+      // after each level -> level++
+      // if the node is inside the level -> height = level;
+      const staticQueueLength = queue.length; // each level queue length
+      for (let i = 0; i < staticQueueLength; i++) {
+        const frontNode = queue.shift();
+        if (node.value === frontNode.value) {
+          depth = level;
+        }
+        if (frontNode.left !== null) {
+          queue.push(frontNode.left);
+        }
+        if (frontNode.right !== null) {
+          queue.push(frontNode.right);
+        }
+      }
+
+      level++;
+    }
     return depth;
   }
   isBalanced() {
@@ -337,7 +383,8 @@ function printTree(string, value) {
   // need to return it
 }
 
-const node = tree.find(30);
-console.log(node);
+const node = tree.find(5);
+tree.depth(node);
 
+tree.height(node);
 prettyPrint(tree.root);
