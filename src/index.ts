@@ -369,7 +369,9 @@ class Tree {
     /**
      * *assumption:
      * checking height of each leaf.
-     * if there is a leaf that return height > 1
+     * need to transverse and find every single parent contain only one child.
+     *
+     * if there is a parent that have 2 nested leaf(2 depth level leaf) that return height > 1
      * return false
      *
      *
@@ -382,6 +384,11 @@ class Tree {
   rebalance() {
     //Write a rebalance function that rebalances an unbalanced tree.
     // Tip: You’ll want to use a traversal method to provide a new array to the buildTree function.
+    /**
+     * *assumptions:
+     * using traversal method like postorder,inorder, preorder ->return array
+     * -> tree.buildTree(that array,0,array.length)
+     */
   }
 }
 
