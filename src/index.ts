@@ -231,59 +231,60 @@ class Tree {
   /**Write inOrder(callback), preOrder(callback), and postOrder(callback) functions that also accept an optional callback as a parameter.
    * Each of these functions should traverse the tree in their respective depth-first order and yield each node to the provided callback.
    * The functions should return an array of values if no callback is given as an argument. */
-  inOrder(callback) {
+  preOrder(callback) {
     // recursive function
-    const array: number[] = [];
+    const array: object[] = [];
 
     function transverse(node: Node) {
       if (node !== null) {
         if (callback) {
-          callback(node.value);
+          callback(node);
         } else {
-          array.push(node.value);
+          array.push(node);
         }
         transverse(node.left);
         transverse(node.right);
       }
     }
     transverse(this.root);
-    return array;
+    if (!callback) return array;
   }
 
-  preOrder(callback) {
+  inOrder(callback) {
     //
-    const array: number[] = [];
+    const array: Node[] = [];
 
     function transverse(node: Node) {
       if (node !== null) {
         transverse(node.left);
         if (callback) {
-          callback(node.value);
+          callback(node);
         } else {
-          array.push(node.value);
+          array.push(node);
         }
         transverse(node.right);
       }
     }
     transverse(this.root);
-    return array;
+    if (!callback) return array;
   }
   postOrder(callback) {
-    const array: number[] = [];
+    const array: object[] = [];
 
     function transverse(node: Node) {
-      transverse(node.left);
-      transverse(node.right);
       if (node !== null) {
+        transverse(node.left);
+        transverse(node.right);
+
         if (callback) {
-          callback(node.value);
+          callback(node);
         } else {
-          array.push(node.value);
+          array.push(node);
         }
       }
     }
     transverse(this.root);
-    return array;
+    if (!callback) return array;
   }
 
   height(node: Node) {
@@ -371,13 +372,23 @@ class Tree {
      * checking height of each leaf.
      * need to transverse and find every single parent contain only one child.
      *
-     * if there is a parent that have 2 nested leaf(2 depth level leaf) that return height > 1
+     * if this.height(these parent) once return >2
      * return false
      *
      *
      *
      * return true
      */
+
+    const arr = this.preOrder();
+
+    for (let i = 0; i < arr.length; i++) {
+      if ((arr[i].left && !arr[i].right) || (arr[i].right && !arr[i].left)) {
+        if (this.height(arr[i]) > 1) {
+          return false;
+        }
+      }
+    }
     return true;
   }
 
@@ -389,6 +400,19 @@ class Tree {
      * using traversal method like postorder,inorder, preorder ->return array
      * -> tree.buildTree(that array,0,array.length)
      */
+
+    if (this.isBalanced()) {
+      return;
+    }
+
+    const arr = this.postOrder();
+    const values: number[] = [];
+    for (let i = 0; i < arr.length; i++) {
+      values.push(arr[i].value);
+    }
+    console.log(values);
+
+    this.root = this.buildTree(values, 0, values.length - 1);
   }
 }
 
@@ -404,7 +428,10 @@ function printTree(string, value) {
 }
 
 const node = tree.find(5);
-tree.depth(node);
+tree.insert(76);
+tree.insert(77);
+console.log(tree.isBalanced());
+prettyPrint(tree.root);
 
-tree.height(node);
+tree.rebalance();
 prettyPrint(tree.root);
